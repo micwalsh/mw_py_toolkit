@@ -14,7 +14,8 @@ export PATH=${PWD}/bin:$PATH
 export PYTHONPATH=${PWD}/lib:$PYTHONPATH
 ```
 
-Here is a sample program which uses many of the mw_toolkit functions.
+The bin/demo.py program demonstrates the use of several of the mw_toolkit functions.  At the time this document was written, the bin/demo.py file looked like this.
+
 
 ```
 #!/usr/bin/env python
@@ -28,54 +29,106 @@ import collections
 
 save_dir_path = sys.path.pop(0)
 
-modules = ['gen_arg', 'gen_print', 'gen_valid']
+modules = ['gen_arg', 'gen_print', 'gen_valid', 'gen_misc', 'gen_cmd']
 for module in modules:
     exec("from " + module + " import *")
 
 sys.path.insert(0, save_dir_path)
 
+valid_pgm_types = ['py', 'sh', 'pl']
+
 parser = argparse.ArgumentParser(
     usage='%(prog)s [OPTIONS]',
-    description="%(prog)s will demonstrate some of the tools found in the mw_tookit repo.",
+    description="%(prog)s will demonstrate several of the tools found in the mw_tookit repo.",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     prefix_chars='-+')
 
 parser.add_argument(
-    '--whatever',
-    default='this',
-    help='bla, bla.')
+    '--pgm_type',
+    default='py',
+    help='The program types supported by this program.  The following values are supported: '
+    + ', '.join(valid_pgm_types))
+
+parser.add_argument(
+    '--temp_dir_path',
+    default='/tmp/',
+    help='A directory for temporary objects.')
+
 
 # Populate stock_list with options we want.
 stock_list = [("test_mode", 0), ("quiet", 0), ("debug", 0)]
 
-def validate_parms():
+
+def exit_function():
     r"""
-    Validate program parameters, etc.
+    Execute whenever the program ends normally or with the signals that we catch (i.e. TERM, INT).  This
+    function will be called by gen_exit_function().
     """
 
-    # This function will be called by gen_setup().  If you have no validation to do, you can delete this
-    # function altogether.
+    qprint_timen("Doing special clean up.")
+    shell_cmd("rm -rf /tmp/my_temp_file")
 
-    valid_value(whatever, ['this', 'that'])
+
+def validate_parms():
+    r"""
+    Validate program parameters, etc.  This function will be called by gen_setup().
+    """
+
+    valid_value(pgm_type, valid_pgm_types)
+    global temp_dir_path
+    valid_dir_path(temp_dir_path)
+    temp_dir_path = add_trailing_slash(temp_dir_path)
+    set_pgm_arg(temp_dir_path)
 
 
 def main():
 
     gen_setup()
 
-    qprint_dashes(width=110)
-    qprint_timen("Printing dashes.")
-    qprint_dashes(width=110)
+    var1 = 57
+    qprint_dashes(width=120)
+    qprintn("Report:")
+    qprint_var(var1)
+    qprint_dashes(width=120)
 
-    my_int = 354
-    my_string = "Hello"
-    my_boolean = True
-    my_float = 3.14
-    my_dict = dict(one=1, two=2, three=3)
-    my_ord_dict = collections.OrderedDict([('one', 1), ('two', 2), ('three', 3)])
-    my_list = ["John", "Jacob", "Jingleheimerschmidt"]
-    my_tuple = ("John", "Jacob", "Jingleheimerschmidt")
-    print_vars(my_int, my_string, my_boolean, my_float, my_dict, my_list, my_tuple)
+    qprintn()
+    qprint_timen("Demonstrating the use of the print_vars() function to print all types of variables:")
+
+    last_name = "Doe"
+    first_name = "John"
+    age = 45
+    weight = 151.2
+    employed = True
+
+    qprint_vars(last_name, first_name, age, weight, employed)
+
+    qprintn()
+    qprint_timen("Demonstrating the use of the print_vars() function to print complex variables:")
+
+    personal_attributes = \
+        {
+            'education':
+            [
+                {
+                    'school_name': 'Edison High',
+                    'degree': 'High School Diploma',
+                    'gpa': '3.5',
+                    'sports': ['basketball', 'volleyball']
+                },
+                {
+                    'school_name': 'Monsters University',
+                    'degree': 'Bachelor of Science',
+                    'gpa': '3.6',
+                    'sports': ['basketball', 'volleyball', 'pickleball']
+                }
+            ],
+            'favorite_quotes': ['A stitch in time saves nine.'],
+            'favorite_colors': ['red', 'purple'],
+        }
+
+    qprint_vars(personal_attributes)
+
+    rc, stdout = shell_cmd('hostname')
 
 
 main()
@@ -85,47 +138,66 @@ The preceding program would produce output that looks something like this:
 
 ```
 
-#(CST) 2020/01/22 13:06:31.489152 -    0.113499 - Running demo.py.
-#(CST) 2020/01/22 13:06:31.489250 -    0.000098 - Program parameter values, etc.:
+#(CST) 2020/01/24 13:52:30.895823 -    1.636184 - Running demo.py.
+#(CST) 2020/01/24 13:52:30.895921 -    0.000098 - Program parameter values, etc.:
 
-command_line:                                     $HOME/bin/demo.py
-demo_py_pid:                                      23706
-demo_py_pgid:                                     23706
-uid:                                              320092 (johndoe)
-gid:                                              536858 (johndoe)
-host_name:                                        my_machine.xxx.com
-DISPLAY:                                          :1
-PYTHON_PGM_PATH:                                  /opt/rh/python27/root/usr/bin/python
-python_version:                                   2.7.16 (default, Jun 28 2019, 12:52:56) [GCC 4.4.7 20120313 (Red Hat 4.4.7-23)]
-debug:                                            0
+command_line:                                     /afs/rchland.ibm.com/usr6/micwalsh/sandbox/apollodev/src/aipl/x86/demo.py
+demo_py_pid:                                      31091
+demo_py_pgid:                                     31091
+uid:                                              111642 (csptest)
+gid:                                              1 (bin)
+host_name:                                        alcb203.aus.stglabs.ibm.com
+DISPLAY:                                          :90
+PYTHON_PGM_PATH:                                  /opt/rh/rh-python36/root/usr/bin/python
+python_version:                                   3.6.3 (default, Apr 10 2019, 11:27:51) [GCC 4.4.7 20120313 (Red Hat 4.4.7-23)]
+pgm_type:                                         py
+temp_dir_path:                                    /tmp/
 test_mode:                                        0
 quiet:                                            0
-whatever:                                         this
+debug:                                            0
 
---------------------------------------------------------------------------------------------------------------
-#(CST) 2020/01/22 13:06:31.512322 -    0.023072 - Printing dashes.
---------------------------------------------------------------------------------------------------------------
-my_int:                                           354
-my_string:                                        Hello
-my_boolean:                                       True
-my_float:                                         3.14
-my_dict:
-  [three]:                                        3
-  [two]:                                          2
-  [one]:                                          1
-my_list:
-  [0]:                                            John
-  [1]:                                            Jacob
-  [2]:                                            Jingleheimerschmidt
-my_tuple:
-  [0]:                                            John
-  [1]:                                            Jacob
-  [2]:                                            Jingleheimerschmidt
+------------------------------------------------------------------------------------------------------------------------
+Report:
+var1:                                             57
+------------------------------------------------------------------------------------------------------------------------
 
-#(CST) 2020/01/22 13:06:31.535949 -    0.023627 - Finished running demo.py.
+#(CST) 2020/01/24 13:52:30.955168 -    0.059247 - Demonstrating the use of the print_vars() function to print all types of variables:
+last_name:                                        Doe
+first_name:                                       John
+age:                                              45
+weight:                                           151.2
+employed:                                         True
 
-demo_py_runtime:                                  0.160372
+#(CST) 2020/01/24 13:52:30.996934 -    0.041766 - Demonstrating the use of the print_vars() function to print complex variables:
+personal_attributes:
+  [education]:
+    [0]:
+      [school_name]:                              Edison High
+      [degree]:                                   High School Diploma
+      [gpa]:                                      3.5
+      [sports]:
+        [0]:                                      basketball
+        [1]:                                      volleyball
+    [1]:
+      [school_name]:                              Monsters University
+      [degree]:                                   Bachelor of Science
+      [gpa]:                                      3.6
+      [sports]:
+        [0]:                                      basketball
+        [1]:                                      volleyball
+        [2]:                                      pickleball
+  [favorite_quotes]:
+    [0]:                                          A stitch in time saves nine.
+  [favorite_colors]:
+    [0]:                                          red
+    [1]:                                          purple
+#(CST) 2020/01/24 13:52:31.021411 -    0.024478 - Issuing: hostname
+alcb203.aus.stglabs.ibm.com
+#(CST) 2020/01/24 13:52:31.034988 -    0.013577 - Doing special clean up.
+#(CST) 2020/01/24 13:52:31.049303 -    0.014314 - Issuing: rm -rf /tmp/my_temp_file
 
+#(CST) 2020/01/24 13:52:31.066765 -    0.017462 - Finished running demo.py.
 
+demo_py_runtime:                                  1.807232
 ```
 
