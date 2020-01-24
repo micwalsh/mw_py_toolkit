@@ -3,7 +3,9 @@ General utilities to assist in python programming
 
 NOTE: The code in this repo was originally written for https://github.com/openbmc/openbmc-test-automation but was recognized as having general utility.
 
-# Example usage
+# Example installation
+
+From a linux bash shell:
 
 ```
 git clone https://github.com/micwalsh/mw_toolkit -o github ./mw_toolkit
