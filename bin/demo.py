@@ -9,54 +9,106 @@ import collections
 
 save_dir_path = sys.path.pop(0)
 
-modules = ['gen_arg', 'gen_print', 'gen_valid']
+modules = ['gen_arg', 'gen_print', 'gen_valid', 'gen_misc', 'gen_cmd']
 for module in modules:
     exec("from " + module + " import *")
 
 sys.path.insert(0, save_dir_path)
 
+valid_pgm_types = ['py', 'sh', 'pl']
+
 parser = argparse.ArgumentParser(
     usage='%(prog)s [OPTIONS]',
-    description="%(prog)s will demonstrate some of the tools found in the mw_tookit repo.",
+    description="%(prog)s will demonstrate several of the tools found in the mw_tookit repo.",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     prefix_chars='-+')
 
 parser.add_argument(
-    '--articles',
-    default='this',
-    help='bla, bla.')
+    '--pgm_type',
+    default='py',
+    help='The program types supported by this program.  The following values are supported: '
+    + ', '.join(valid_pgm_types))
+
+parser.add_argument(
+    '--temp_dir_path',
+    default='/tmp/',
+    help='A directory for temporary objects.')
+
 
 # Populate stock_list with options we want.
 stock_list = [("test_mode", 0), ("quiet", 0), ("debug", 0)]
 
 
-def validate_parms():
+def exit_function():
     r"""
-    Validate program parameters, etc.
+    Execute whenever the program ends normally or with the signals that we catch (i.e. TERM, INT).  This
+    function will be called by gen_exit_function().
     """
 
-    # This function will be called by gen_setup().
+    qprint_timen("Doing special clean up.")
+    shell_cmd("rm -rf /tmp/my_temp_file")
 
-    valid_value(articles, ['this', 'that'])
+
+def validate_parms():
+    r"""
+    Validate program parameters, etc.  This function will be called by gen_setup().
+    """
+
+    valid_value(pgm_type, valid_pgm_types)
+    global temp_dir_path
+    valid_dir_path(temp_dir_path)
+    temp_dir_path = add_trailing_slash(temp_dir_path)
+    set_pgm_arg(temp_dir_path)
 
 
 def main():
 
     gen_setup()
 
-    qprint_dashes(width=110)
-    qprint_timen("Printing dashes.")
-    qprint_dashes(width=110)
+    var1 = 57
+    qprint_dashes(width=120)
+    qprintn("Report:")
+    qprint_var(var1)
+    qprint_dashes(width=120)
 
-    my_int = 354
-    my_string = "Hello"
-    my_boolean = True
-    my_float = 3.14
-    my_dict = dict(one=1, two=2, three=3)
-    my_ord_dict = collections.OrderedDict([('one', 1), ('two', 2), ('three', 3)])
-    my_list = ["John", "Jacob", "Jingleheimerschmidt"]
-    my_tuple = ("John", "Jacob", "Jingleheimerschmidt")
-    print_vars(my_int, my_string, my_boolean, my_float, my_dict, my_list, my_tuple)
+    qprintn()
+    qprint_timen("Demonstrating the use of the print_vars() function to print all types of variables:")
+
+    last_name = "Doe"
+    first_name = "John"
+    age = 45
+    weight = 151.2
+    employed = True
+
+    qprint_vars(last_name, first_name, age, weight, employed)
+
+    qprintn()
+    qprint_timen("Demonstrating the use of the print_vars() function to print complex variables:")
+
+    personal_attributes = \
+        {
+            'education':
+            [
+                {
+                    'school_name': 'Edison High',
+                    'degree': 'High School Diploma',
+                    'gpa': '3.5',
+                    'sports': ['basketball', 'volleyball']
+                },
+                {
+                    'school_name': 'Monsters University',
+                    'degree': 'Bachelor of Science',
+                    'gpa': '3.6',
+                    'sports': ['basketball', 'volleyball', 'pickleball']
+                }
+            ],
+            'favorite_quotes': ['A stitch in time saves nine.'],
+            'favorite_colors': ['red', 'purple'],
+        }
+
+    qprint_vars(personal_attributes)
+
+    rc, stdout = shell_cmd('hostname')
 
 
 main()
