@@ -3,6 +3,15 @@ General utilities to assist in python programming
 
 NOTE: The code in this repo was originally written for https://github.com/openbmc/openbmc-test-automation but was recognized as having general utility.
 
+*Example usage*
+
+```
+git clone https://github.com/micwalsh/mw_toolkit -o github ./mw_toolkit
+cd mw_toolkit/
+export PATH=${PWD}/bin:$PATH
+export PYTHONPATH=${PWD}/lib:$PYTHONPATH
+```
+
 Here is a sample program which uses many of the mw_toolkit functions.
 
 ```
