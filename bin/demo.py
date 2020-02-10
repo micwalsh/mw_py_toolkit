@@ -4,16 +4,11 @@ r"""
 See help text for details.
 """
 
-import sys
 import collections
 
-save_dir_path = sys.path.pop(0)
-
-modules = ['gen_arg', 'gen_print', 'gen_valid', 'gen_misc', 'gen_cmd']
-for module in modules:
-    exec("from " + module + " import *")
-
-sys.path.insert(0, save_dir_path)
+from gen_arg import *
+from gen_print import *
+from gen_valid import *
 
 valid_pgm_types = ['py', 'sh', 'pl']
 
