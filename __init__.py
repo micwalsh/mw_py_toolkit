@@ -2,7 +2,7 @@ import sys
 import os
 import argparse
 
-# Add the mwtoolkit/lib subdirectory to sys.path to allow modules to import sister modules.
+# Add the mwtoolkit/lib subdirectory to sys.path to subordinate modules to import sister modules.
 # Note: All directory path values will include a trailing slash.
 package_base_dir_path = os.path.dirname(os.path.realpath(__file__)) + os.sep
 sys.path.append(package_base_dir_path + "lib")
