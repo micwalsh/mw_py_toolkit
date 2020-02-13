@@ -246,6 +246,14 @@ def valid_value(var_value, valid_values=[], invalid_values=[], var_name=None):
                                        gp.blank() | gp.show_type())
         return process_error_message(error_message)
 
+    error_message = valid_type(valid_values, list, var_name='valid_values')
+    if error_message:
+        return process_error_message(error_message)
+
+    error_message = valid_type(invalid_values, list, var_name='invalid_values')
+    if error_message:
+        return process_error_message(error_message)
+    
     if len_invalid_values == 0:
         # Assign default value.
         invalid_values = ["", None]
