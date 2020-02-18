@@ -60,7 +60,7 @@ def makedirs(path, mode=0o777, quiet=None):
     2) It will print an "Issuing: os.makedirs" message.
 
     Description of argument(s):
-    path                            The directory path of the directories to be created.
+    path                            The path containing the directories to be created.
     mode                            The mode or permissions to be granted to the created directories.
     quiet                           Indicates whether this function should run the print_issuing() function.
     """
@@ -70,6 +70,22 @@ def makedirs(path, mode=0o777, quiet=None):
         os.makedirs(path, mode)
     except FileExistsError:
         pass
+
+
+def chdir(path, quiet=None):
+    r"""
+    Call os.chdir with the caller's arguments.
+
+    This function offers this advantage over the base os.chdir function:
+    - It will not fail if the directory already exists.
+
+    Description of argument(s):
+    path                            The path of the directory to change to.
+    quiet                           Indicates whether this function should run the print_issuing() function.
+    """
+    quiet = int(dft(quiet, gp.get_stack_var('quiet', 0)))
+    gp.qprint_issuing("os.chdir('" + path + "')")
+    os.chdir(path)
 
 
 def which(file_path):
