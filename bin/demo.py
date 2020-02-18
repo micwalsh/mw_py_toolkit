@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-r"""
-See help text for details.
-"""
-
 import collections
 
 from gen_arg import *
