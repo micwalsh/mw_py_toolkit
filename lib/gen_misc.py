@@ -77,7 +77,7 @@ def chdir(path, quiet=None):
     Call os.chdir with the caller's arguments.
 
     This function offers this advantage over the base os.chdir function:
-    - It will not fail if the directory already exists.
+    - It will print an "Issuing: os.chdir" message.
 
     Description of argument(s):
     path                            The path of the directory to change to.
