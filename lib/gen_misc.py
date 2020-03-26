@@ -85,7 +85,7 @@ def rmtree(path, ignore_errors=False, onerror=None, quiet=None):
     quiet                           Indicates whether this function should run the print_issuing() function.
     """
     quiet = int(dft(quiet, gp.get_stack_var('quiet', 0)))
-    print_string = gp.sprint_executing()
+    print_string = gp.sprint_executing(max_width=2000)
     print_string = re.sub(r"Executing: ", "Issuing: shutil.", print_string.rstrip("\n"))
     gp.qprintn(re.sub(r", quiet[ ]?=.*", ")", print_string))
     shutil.rmtree(path, ignore_errors, onerror)
