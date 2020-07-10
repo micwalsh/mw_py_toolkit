@@ -5,11 +5,13 @@ This module provides many print functions such as sprint_var, sprint_time, sprin
 """
 
 import sys
+windows_platform = (sys.platform == 'win32' or sys.platform == 'win64')
 import os
 import time
 import inspect
 import re
-import grp
+if not windows_platform:
+    import grp
 import socket
 import argparse
 import copy
@@ -524,7 +526,12 @@ def sprint_time(buffer=""):
     pos = nanoseconds.find(".")
     nanoseconds = nanoseconds[pos:]
 
-    time_string = time.strftime("#(%Z) %Y/%m/%d %H:%M:%S", loc_time)
+    zone = time.strftime("%Z", loc_time)
+    if len(zone) > 3:
+        # If the zone is spelled out (e.g. "Central Daylight Time"),
+        # abbreviate it (e.g. "CDT").
+        zone = ''.join([x[0] for x in zone.split(' ')])
+    time_string = time.strftime("#(" + zone + ") %Y/%m/%d %H:%M:%S", loc_time)
     if NANOSECONDS == "1":
         time_string = time_string + nanoseconds
 
@@ -1476,21 +1483,25 @@ def sprint_pgm_header(indent=0,
     # variable name.  Therefore, we'll use pgm_name_var_name which was set when this module was imported.
     buffer += sprint_varx(pgm_name_var_name + "_pid", os.getpid(), 0, indent,
                           col1_width)
-    buffer += sprint_varx(pgm_name_var_name + "_pgid", os.getpgrp(), 0, indent,
-                          col1_width)
-    userid_num = str(os.geteuid())
-    try:
-        username = os.getlogin()
-    except OSError:
-        if userid_num == "0":
-            username = "root"
-        else:
-            username = "?"
-    buffer += sprint_varx("uid", userid_num + " (" + username
-                          + ")", 0, indent, col1_width)
-    buffer += sprint_varx("gid", str(os.getgid()) + " ("
-                          + str(grp.getgrgid(os.getgid()).gr_name) + ")", 0,
-                          indent, col1_width)
+    if windows_platform:
+        buffer += sprint_varx("username", os.getlogin(), 0, indent, col1_width)
+    else:
+        buffer += sprint_varx(pgm_name_var_name + "_pgid", os.getpgrp(), 0, indent,
+                              col1_width)
+        userid_num = str(os.geteuid())
+        try:
+            username = os.getlogin()
+        except OSError:
+            if userid_num == "0":
+                username = "root"
+            else:
+                username = "?"
+        buffer += sprint_varx("uid", userid_num + " (" + username
+                              + ")", 0, indent, col1_width)
+    if not windows_platform:
+        buffer += sprint_varx("gid", str(os.getgid()) + " ("
+                              + str(grp.getgrgid(os.getgid()).gr_name) + ")", 0,
+                              indent, col1_width)
     buffer += sprint_varx("host_name", socket.gethostname(), 0, indent,
                           col1_width)
     try:

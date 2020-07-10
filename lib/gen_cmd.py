@@ -8,7 +8,11 @@ import os
 import sys
 import subprocess
 import collections
-import signal
+try:
+    import signal
+    signal_imported = True
+except AttributeError:
+    signal_imported = False
 import time
 import re
 import inspect
@@ -235,7 +239,10 @@ def parse_command_string(command_string):
 
 
 # Save the original SIGALRM handler for later restoration by shell_cmd.
-original_sigalrm_handler = signal.getsignal(signal.SIGALRM)
+try:
+    original_sigalrm_handler = signal.getsignal(signal.SIGALRM)
+except AttributeError:
+    pass
 
 
 def shell_cmd_timed_out(signal_number,
