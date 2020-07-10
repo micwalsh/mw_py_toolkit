@@ -1,4 +1,4 @@
-# mw_toolkit
+# mw_py_toolkit
 General utilities to assist in python programming
 
 NOTE: The code in this repo was originally written for https://github.com/openbmc/openbmc-test-automation but was recognized as having general utility.
@@ -8,13 +8,13 @@ NOTE: The code in this repo was originally written for https://github.com/openbm
 From a linux bash shell:
 
 ```
-git clone https://github.com/micwalsh/mw_toolkit -o github ./mw_toolkit
-cd mw_toolkit/
+git clone https://github.com/micwalsh/mw_py_toolkit -o github ./mw_py_toolkit
+cd mw_py_toolkit/
 export PATH=${PWD}/bin:$PATH
 export PYTHONPATH=${PWD}/lib:$PYTHONPATH
 ```
 
-The bin/demo.py program demonstrates the use of several of the mw_toolkit functions.  At the time this document was written, the bin/demo.py file looked like this.
+The bin/demo.py program demonstrates the use of several of the mw_py_toolkit functions.  At the time this document was written, the bin/demo.py file looked like this.
 
 
 ```
