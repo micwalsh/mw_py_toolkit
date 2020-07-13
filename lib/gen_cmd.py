@@ -358,13 +358,19 @@ def shell_cmd(command_string,
     global command_timed_out
     command_timed_out = False
     func_out_history_buf = ""
+    if gp.windows_platform:
+        preexec_fn = None
+        executable = None
+    else:
+        preexec_fn = os.setsid
+        executable = '/bin/bash'
     for attempt_num in range(1, max_attempts + 1):
         sub_proc = subprocess.Popen(command_string,
-                                    preexec_fn=os.setsid,
+                                    preexec_fn=preexec_fn,
                                     bufsize=1,
                                     shell=True,
                                     universal_newlines=True,
-                                    executable='/bin/bash',
+                                    executable=executable,
                                     stdout=subprocess.PIPE,
                                     stderr=stderr)
         if fork:
@@ -380,8 +386,9 @@ def shell_cmd(command_string,
         except IOError:
             command_timed_out = True
         # Restore the original SIGALRM handler and clear the alarm.
-        signal.signal(signal.SIGALRM, original_sigalrm_handler)
-        signal.alarm(0)
+        if not gp.windows_platform:
+            signal.signal(signal.SIGALRM, original_sigalrm_handler)
+            signal.alarm(0)
 
         # Output from this loop iteration is written to func_out_buf for later processing.  This can include
         # stdout, stderr and our own error messages.
